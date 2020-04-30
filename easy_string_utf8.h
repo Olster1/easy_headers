@@ -3,6 +3,8 @@ A simple header include library like Sean Barret's stb libraries.
 
 This library makes it easy to handle utf8 encoded c strings (null terminated).
 
+You have to #define EASY_STRING_IMPLEMENTATION before including the file to add the implementation part of it. 
+
 ////////////////////////////////////////////////////////////////////
 
 How to use:
@@ -13,7 +15,7 @@ easyString_getSizeInBytes_utf8(char *str) - get the size of the string in bytes 
 easyString_getStringLength_utf8(char *str) - the number of glyphs in the string NOT INCLUDING THE NULL TERMINATOR. This function probably isn't very helpful. 
 
 ////////////////////////////////////////////////////////////////////
-
+Probably the most useful function. See example below, but useful for rendering a utf8 string.  
 easyUnicode_utf8_codepoint_To_Utf32_codepoint(char **streamPtr, int advancePtr) - get the next codepoint in the utf8 string, & you can choose to advance your string pointer.  
 
 ////////////////////////////////////////////////////////////////////
@@ -29,7 +31,7 @@ int easyString_stringsMatch_nullTerminated(char *a, char *b) - compares two null
 
 ////////////////////////////////////////////////////////////////////
 
-Example file:
+Examples:
 
 int main(int argc, char *args[]) {
 
@@ -46,8 +48,8 @@ int main(int argc, char *args[]) {
 
  int main(int argc, char *args[]) {
 
-	char *string = "გთხოვთ";
-	char *at = string; //Take copy since string is a read only variable
+	char *str_utf8 = "გთხოვთ";
+	char *at = string; //Take copy since str_utf8 is a read only variable
 	
 	while(*at) {
 		unsigned int utf32Codepoint = easyUnicode_utf8_codepoint_To_Utf32_codepoint(&at, 1);
@@ -87,7 +89,7 @@ int main(int argc, char *args[]) {
 #endif
 
 #ifndef EASY_STRING_IMPLEMENTATION
-#define EASY_STRING_IMPLEMENTATION 1
+#define EASY_STRING_IMPLEMENTATION 0
 #endif
 
 #ifndef EASY_STRING_ALLOC
