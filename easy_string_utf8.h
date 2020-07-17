@@ -80,26 +80,26 @@ int main(int argc, char *args[]) {
  }
 
 */
-
 #ifndef EASY_STRING_UTF8_H
 #define EASY_STRING_UTF8_H
 
-#ifndef EASY_STRING_ASSERT
-#define EASY_STRING_ASSERT(statement) if(!(statement)) { int *i_ptr = 0; *(i_ptr) = 0; }
-#endif
 
 #ifndef EASY_STRING_IMPLEMENTATION
 #define EASY_STRING_IMPLEMENTATION 0
 #endif
 
-#ifndef EASY_STRING_ALLOC
-#include <stdlib.h>
-#define EASY_STRING_ALLOC(size) malloc(size)
+#ifndef EASY_HEADERS_ASSERT
+#define EASY_HEADERS_ASSERT(statement) if(!(statement)) { int *i_ptr = 0; *(i_ptr) = 0; }
 #endif
 
-#ifndef EASY_STRING_FREE
+#ifndef EASY_HEADERS_ALLOC
 #include <stdlib.h>
-#define EASY_STRING_FREE(ptr) free(ptr)
+#define EASY_HEADERS_ALLOC(size) malloc(size)
+#endif
+
+#ifndef EASY_HEADERS_FREE
+#include <stdlib.h>
+#define EASY_HEADERS_FREE(ptr) free(ptr)
 #endif
 
 ///////////////////////************ Header definitions start here *************////////////////////
@@ -160,11 +160,11 @@ int easyUnicode_unicodeLength(unsigned char byte) {
 	int result = 1;
 	unsigned char shiftedByte = byte >> 4;
 	if(!easyUnicode_isContinuationByte(byte) && !easyUnicode_isSingleByte(byte)) {
-		EASY_STRING_ASSERT(easyUnicode_isLeadingByte(byte));
+		EASY_HEADERS_ASSERT(easyUnicode_isLeadingByte(byte));
 		if(shiftedByte == bytes2) { result = 2; }
 		if(shiftedByte == bytes3) { result = 3; }
 		if(shiftedByte == bytes4) { result = 4; }
-		if(result == 1) EASY_STRING_ASSERT(!"invalid path");
+		if(result == 1) EASY_HEADERS_ASSERT(!"invalid path");
 	} 
 
 	return result;
@@ -179,17 +179,17 @@ unsigned int easyUnicode_utf8_codepoint_To_Utf32_codepoint(char **streamPtr, int
 	unsigned int fiveBitsFull = (1 << 4 | 1 << 3 | 1 << 2 | 1 << 1 | 1 << 0);
 	unsigned int fourBitsFull = (1 << 3 | 1 << 2 | 1 << 1 | 1 << 0);
 
-	if(easyUnicode_isContinuationByte(stream[0])) { EASY_STRING_ASSERT(!"shouldn't be a continuation byte. Have you advanced pointer correctly?"); }
+	if(easyUnicode_isContinuationByte(stream[0])) { EASY_HEADERS_ASSERT(!"shouldn't be a continuation byte. Have you advanced pointer correctly?"); }
 	int unicodeLen = easyUnicode_unicodeLength(stream[0]);
 	if(unicodeLen > 1) {
-		EASY_STRING_ASSERT(easyUnicode_isLeadingByte(stream[0]));
+		EASY_HEADERS_ASSERT(easyUnicode_isLeadingByte(stream[0]));
 		//needs to be decoded
 		switch(unicodeLen) {
 			case 2: {
 				// printf("%s\n", "two byte unicode");
 				unsigned int firstByte = stream[0];
 				unsigned int secondByte = stream[1];
-				EASY_STRING_ASSERT(easyUnicode_isContinuationByte(secondByte));
+				EASY_HEADERS_ASSERT(easyUnicode_isContinuationByte(secondByte));
 				result |= (secondByte & sixBitsFull);
 				result |= ((firstByte & sixBitsFull) << 6);
 
@@ -200,8 +200,8 @@ unsigned int easyUnicode_utf8_codepoint_To_Utf32_codepoint(char **streamPtr, int
 				unsigned int firstByte = stream[0];
 				unsigned int secondByte = stream[1];
 				unsigned int thirdByte = stream[2];
-				EASY_STRING_ASSERT(easyUnicode_isContinuationByte(secondByte));
-				EASY_STRING_ASSERT(easyUnicode_isContinuationByte(thirdByte));
+				EASY_HEADERS_ASSERT(easyUnicode_isContinuationByte(secondByte));
+				EASY_HEADERS_ASSERT(easyUnicode_isContinuationByte(thirdByte));
 				result |= (thirdByte & sixBitsFull);
 				result |= ((secondByte & sixBitsFull) << 6);
 				result |= ((firstByte & fiveBitsFull) << 12);
@@ -214,9 +214,9 @@ unsigned int easyUnicode_utf8_codepoint_To_Utf32_codepoint(char **streamPtr, int
 				unsigned int secondByte = stream[1];
 				unsigned int thirdByte = stream[2];
 				unsigned int fourthByte = stream[3];
-				EASY_STRING_ASSERT(easyUnicode_isContinuationByte(secondByte));
-				EASY_STRING_ASSERT(easyUnicode_isContinuationByte(thirdByte));
-				EASY_STRING_ASSERT(easyUnicode_isContinuationByte(fourthByte));
+				EASY_HEADERS_ASSERT(easyUnicode_isContinuationByte(secondByte));
+				EASY_HEADERS_ASSERT(easyUnicode_isContinuationByte(thirdByte));
+				EASY_HEADERS_ASSERT(easyUnicode_isContinuationByte(fourthByte));
 				result |= (thirdByte & sixBitsFull);
 				result |= ((secondByte & sixBitsFull) << 6);
 				result |= ((firstByte & sixBitsFull) << 12);
@@ -225,7 +225,7 @@ unsigned int easyUnicode_utf8_codepoint_To_Utf32_codepoint(char **streamPtr, int
 				if(advancePtr) (*streamPtr) += 4;
 			} break;
 			default: {
-				EASY_STRING_ASSERT(!"invalid path");
+				EASY_HEADERS_ASSERT(!"invalid path");
 			}
 		}
 	} else {
@@ -264,12 +264,12 @@ int easyString_getStringLength_utf8(char *string) {
 //IMPORTANT: string must be null terminated. 
 unsigned int *easyUnicode_utf8StreamToUtf32Stream_allocates(char *stream) {
 	unsigned int size = easyString_getStringLength_utf8(stream) + 1; //for null terminator
-	unsigned int *result = (unsigned int *)(EASY_STRING_ALLOC(size*sizeof(unsigned int)));
+	unsigned int *result = (unsigned int *)(EASY_HEADERS_ALLOC(size*sizeof(unsigned int)));
 	unsigned int *at = result;
 	while(*stream) {
 		char *a = stream;
 		*at = easyUnicode_utf8_codepoint_To_Utf32_codepoint(&stream, 1);
-		EASY_STRING_ASSERT(stream != a);
+		EASY_HEADERS_ASSERT(stream != a);
 		at++;
 	}
 	result[size - 1] = '\0';
@@ -277,7 +277,7 @@ unsigned int *easyUnicode_utf8StreamToUtf32Stream_allocates(char *stream) {
 }
 
 void easyString_free_Utf32_string(char *string) {
-	EASY_STRING_FREE(string);
+	EASY_HEADERS_FREE(string);
 }
 
 
