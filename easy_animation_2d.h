@@ -6,8 +6,8 @@
 #define EASY_STRING_IMPLEMENTATION 0
 #endif
 
-#ifndef EASY_HEADERS_ASSERT
-#define EASY_HEADERS_ASSERT(statement) if(!(statement)) { int *i_ptr = 0; *(i_ptr) = 0; }
+#ifndef EASY_HEADERS_EASY_HEADERS_ASSERT
+#define EASY_HEADERS_EASY_HEADERS_ASSERT(statement) if(!(statement)) { int *i_ptr = 0; *(i_ptr) = 0; }
 #endif
 
 #ifndef EASY_HEADERS_ALLOC
@@ -104,7 +104,7 @@ static void easyAnimation_initAnimation(Animation *animation, char **FileNames, 
     animation->frameCount = 0;
 
     for(int i = 0; i < FileNameCount; ++i) {
-        assert(animation->frameCount < arrayCount(animation->frames));
+        EASY_HEADERS_ASSERT(animation->frameCount < arrayCount(animation->frames));
         animation->frames[animation->frameCount++] = easyAnimation2d_copyString(FileNames[i]);
     }
 }
@@ -146,7 +146,7 @@ static void easyAnimation_addAnimationToController(EasyAnimation_Controller *con
         Item = (EasyAnimation_ListItem *)EASY_HEADERS_ALLOC(sizeof(EasyAnimation_ListItem));
     }
     
-    assert(Item);
+    EASY_HEADERS_ASSERT(Item);
     
     Item->timerAt = 0;
     Item->timerPeriod = period;
@@ -187,9 +187,9 @@ static char *easyAnimation_updateAnimation(EasyAnimation_Controller *controller,
     EasyAnimation_ListItem *AnimationListSentintel = &controller->parent;
 
     EasyAnimation_ListItem *Item = AnimationListSentintel->next;
-    assert(Item != AnimationListSentintel);
+    EASY_HEADERS_ASSERT(Item != AnimationListSentintel);
     
-    assert(Item->timerAt >= 0);
+    EASY_HEADERS_ASSERT(Item->timerAt >= 0);
 
     Item->timerAt += dt;    
 
